@@ -1,6 +1,10 @@
 from openai import OpenAI
 from tavily import TavilyClient
 import os
+from dotenv import load_dotenv
+
+
+load_dotenv('config.env')
 
 open_ai_client = OpenAI()
 
