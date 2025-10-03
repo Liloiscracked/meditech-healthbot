@@ -1,5 +1,5 @@
 from common.models import State
-from common.client import open_ai_client, tavily_client
+from common.client import llm, tavily_client
 import os
 from tavily import TavilyClient
 from langchain_core.tools import tool
