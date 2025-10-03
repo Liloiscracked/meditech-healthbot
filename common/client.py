@@ -9,5 +9,6 @@ load_dotenv("config.env")
 llm = ChatOpenAI(
     model="gpt-4o-mini",
     temperature=0.0,
+    api_key=os.getenv("OPENAI_API_KEY"),
 )
 tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
