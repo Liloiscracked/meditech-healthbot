@@ -1,11 +1,6 @@
-from common.models import State
+from common.States import State
 from common.client import llm, tavily_client
-import os
-from tavily import TavilyClient
-from langchain_core.tools import tool
-import re
 import uuid
-from typing_extensions import Literal, Annotated
 from langchain_core.messages import (
     SystemMessage,
     AIMessage,
@@ -24,7 +19,7 @@ from langgraph.prebuilt import ToolNode
 from langgraph.types import Command
 from IPython.display import Image, display
 
-
+from langgraph.graph import StateGraph, START, END
 
 
 from langchain_core.messages import HumanMessage, AIMessage
@@ -32,9 +27,12 @@ import uuid
 
 # --- NODE IMPLEMENTATIONS ---
 
+
 def ask_user_node(state: State) -> State:
     """Ask the patient what health topic or condition they’d like to learn about."""
-    topic = input("What health topic or medical condition would you like to learn about? ")
+    topic = input(
+        "What health topic or medical condition would you like to learn about? "
+    )
     state.input = topic
     state.messages.append(HumanMessage(content=topic, id=str(uuid.uuid4())))
     return state
@@ -54,7 +52,7 @@ def summarize_conversation(state: State) -> State:
     )
     ai_message = llm.invoke([summary_prompt])
     ai_message.id = str(uuid.uuid4())
-    
+
     state.summary = ai_message.content
     state.messages.append(ai_message)
     return state
@@ -84,7 +82,7 @@ def make_quiz_node(state: State) -> State:
     )
     ai_message = llm.invoke([quiz_prompt])
     ai_message.id = str(uuid.uuid4())
-    
+
     state.quiz_question = ai_message.content
     state.messages.append(ai_message)
     return state
@@ -119,7 +117,7 @@ def grade_node(state: State) -> State:
     )
     grade_message = llm.invoke([grader_prompt])
     grade_message.id = str(uuid.uuid4())
-    
+
     state.grade = grade_message.content
     state.messages.append(grade_message)
     return state
@@ -137,7 +135,7 @@ def restart_node(state: State) -> State:
     """Ask if the patient wants to restart or exit."""
     response = input("Would you like to learn about another health topic? (Y/N): ")
     state.restart = response.strip().lower() == "y"
-    
+
     # Reset sensitive state if restarting (privacy requirement)
     if state.restart:
         state.input = None
@@ -147,7 +145,7 @@ def restart_node(state: State) -> State:
         state.user_answer = None
         state.grade = None
         state.messages = []
-    
+
     return state
 
 
@@ -182,11 +180,15 @@ workflow.add_edge("collect_answer", "grade")
 workflow.add_edge("grade", "present_grade")
 workflow.add_edge("present_grade", "restart")
 
+
 # --- CONDITIONAL ENDING ---
 def check_restart(state: State) -> str:
     return "ask_user" if state.restart else END
 
-workflow.add_conditional_edges("restart", check_restart, {"ask_user": "ask_user", END: END})
+
+workflow.add_conditional_edges(
+    "restart", check_restart, {"ask_user": "ask_user", END: END}
+)
 
 # Compile graph
 app = workflow.compile()
