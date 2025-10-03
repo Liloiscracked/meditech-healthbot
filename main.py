@@ -1,4 +1,4 @@
-from common.models import State
+from common.States import State
 from common.tools.nodes import app
 
 if __name__ == "__main__":
