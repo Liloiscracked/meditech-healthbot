@@ -1,8 +1,7 @@
 from common.States import State
-from common.tools.nodes import app
+from common.nodes import app
 
-if __name__ == "__main__":
-    print("=== Welcome to HealthBot: AI-Powered Patient Education System ===\n")
-    # Start the workflow with an empty state
-    final_state = app.invoke(State())
-    print("\n=== Session Ended ===")
+print("=== Welcome to HealthBot: AI-Powered Patient Education System ===\n")
+# Start the workflow with an empty state
+final_state = app.invoke(State())
+print("\n=== Session Ended ===")

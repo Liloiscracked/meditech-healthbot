@@ -3,15 +3,9 @@ from common.client import llm, tavily_client
 import uuid
 from langchain_core.messages import HumanMessage
 from langgraph.graph import START, END, StateGraph
-from langgraph.graph import StateGraph, START, END
 
-
-from langchain_core.messages import HumanMessage
-import uuid
 
 # --- NODE IMPLEMENTATIONS ---
-
-
 def ask_user_node(state: State) -> State:
     """Ask the patient what health topic or condition they’d like to learn about."""
     topic = input(
@@ -120,7 +114,7 @@ def restart_node(state: State) -> State:
     response = input("Would you like to learn about another health topic? (Y/N): ")
     state.restart = response.strip().lower() == "y"
 
-    # Reset sensitive state if restarting (privacy requirement)
+    # Reset state if restarting 
     if state.restart:
         state.input = None
         state.output = None
